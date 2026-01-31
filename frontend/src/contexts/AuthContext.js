@@ -1,6 +1,12 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 const AuthContext = createContext();
 
@@ -25,19 +31,22 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   }, []);
 
-  const fetchUser = useCallback(async (authToken) => {
-    try {
-      const response = await axios.get(`${API_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-      setUser(response.data);
-    } catch (error) {
-      console.error("Failed to fetch user:", error);
-      logout();
-    } finally {
-      setLoading(false);
-    }
-  }, [API_URL, logout]);
+  const fetchUser = useCallback(
+    async (authToken) => {
+      try {
+        const response = await axios.get(`${API_URL}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setUser(response.data);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+        logout();
+      } finally {
+        setLoading(false);
+      }
+    },
+    [API_URL, logout],
+  );
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");

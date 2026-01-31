@@ -1,40 +1,52 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { taskAPI } from '../services/api';
-import { useAuth } from '../contexts/AuthContext';
-import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { Input } from './ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { TaskDialog } from './TaskDialog';
-import { toast } from 'sonner';
+import { format, isPast, isToday, isTomorrow } from "date-fns";
 import {
-  Plus,
-  Search,
-  LogOut,
-  User,
+  AlertCircle,
+  BarChart3,
+  Calendar,
   CheckCircle2,
   Circle,
   Clock,
-  AlertCircle,
-  TrendingUp,
   Filter,
-  Calendar,
   ListTodo,
-  BarChart3
-} from 'lucide-react';
-import { format, isPast, isToday, isTomorrow } from 'date-fns';
+  LogOut,
+  Plus,
+  Search,
+  TrendingUp,
+  User,
+} from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useAuth } from "../contexts/AuthContext";
+import { taskAPI } from "../services/api";
+import { TaskDialog } from "./TaskDialog";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Input } from "./ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 export const Dashboard = () => {
   const { user, logout } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [priorityFilter, setPriorityFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
@@ -42,16 +54,16 @@ export const Dashboard = () => {
     try {
       const params = {
         sortBy,
-        order: sortOrder
+        order: sortOrder,
       };
-      if (statusFilter !== 'all') params.status = statusFilter;
-      if (priorityFilter !== 'all') params.priority = priorityFilter;
+      if (statusFilter !== "all") params.status = statusFilter;
+      if (priorityFilter !== "all") params.priority = priorityFilter;
       if (searchTerm) params.search = searchTerm;
 
       const response = await taskAPI.getAllTasks(params);
       setTasks(response.data);
     } catch (error) {
-      toast.error('Failed to fetch tasks');
+      toast.error("Failed to fetch tasks");
     } finally {
       setLoading(false);
     }
@@ -62,7 +74,7 @@ export const Dashboard = () => {
       const response = await taskAPI.getStats();
       setStats(response.data);
     } catch (error) {
-      console.error('Failed to fetch stats:', error);
+      console.error("Failed to fetch stats:", error);
     }
   }, []);
 
@@ -82,15 +94,15 @@ export const Dashboard = () => {
   };
 
   const handleDeleteTask = async (taskId) => {
-    if (!window.confirm('Are you sure you want to delete this task?')) return;
+    if (!window.confirm("Are you sure you want to delete this task?")) return;
 
     try {
       await taskAPI.deleteTask(taskId);
-      toast.success('Task deleted successfully');
+      toast.success("Task deleted successfully");
       fetchTasks();
       fetchStats();
     } catch (error) {
-      toast.error('Failed to delete task');
+      toast.error("Failed to delete task");
     }
   };
 
@@ -102,11 +114,11 @@ export const Dashboard = () => {
 
   const getPriorityIcon = (priority) => {
     switch (priority) {
-      case 'high':
+      case "high":
         return <AlertCircle className="w-4 h-4" />;
-      case 'medium':
+      case "medium":
         return <TrendingUp className="w-4 h-4" />;
-      case 'low':
+      case "low":
         return <Circle className="w-4 h-4" />;
       default:
         return null;
@@ -115,11 +127,11 @@ export const Dashboard = () => {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'completed':
+      case "completed":
         return <CheckCircle2 className="w-4 h-4" />;
-      case 'in-progress':
+      case "in-progress":
         return <Clock className="w-4 h-4" />;
-      case 'todo':
+      case "todo":
         return <Circle className="w-4 h-4" />;
       default:
         return null;
@@ -129,18 +141,18 @@ export const Dashboard = () => {
   const getDueDateLabel = (dueDate) => {
     if (!dueDate) return null;
     const date = new Date(dueDate);
-    if (isToday(date)) return 'Today';
-    if (isTomorrow(date)) return 'Tomorrow';
-    if (isPast(date)) return 'Overdue';
-    return format(date, 'MMM dd, yyyy');
+    if (isToday(date)) return "Today";
+    if (isTomorrow(date)) return "Tomorrow";
+    if (isPast(date)) return "Overdue";
+    return format(date, "MMM dd, yyyy");
   };
 
   const getDueDateColor = (dueDate, status) => {
-    if (!dueDate || status === 'completed') return 'text-muted-foreground';
+    if (!dueDate || status === "completed") return "text-muted-foreground";
     const date = new Date(dueDate);
-    if (isPast(date)) return 'text-red-400';
-    if (isToday(date) || isTomorrow(date)) return 'text-yellow-400';
-    return 'text-muted-foreground';
+    if (isPast(date)) return "text-red-400";
+    if (isToday(date) || isTomorrow(date)) return "text-yellow-400";
+    return "text-muted-foreground";
   };
 
   return (
@@ -154,8 +166,15 @@ export const Dashboard = () => {
                 <CheckCircle2 className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold" style={{fontFamily: 'Manrope'}}>TaskFlow</h1>
-                <p className="text-xs text-muted-foreground">Professional Task Management</p>
+                <h1
+                  className="text-2xl font-bold"
+                  style={{ fontFamily: "Manrope" }}
+                >
+                  TaskFlow
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  Professional Task Management
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -180,13 +199,20 @@ export const Dashboard = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Stats */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8" data-testid="stats-section">
+          <div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+            data-testid="stats-section"
+          >
             <Card className="stat-card border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Total Tasks</p>
-                    <p className="text-3xl font-bold" data-testid="stat-total">{stats.total}</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Total Tasks
+                    </p>
+                    <p className="text-3xl font-bold" data-testid="stat-total">
+                      {stats.total}
+                    </p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
                     <ListTodo className="w-6 h-6 text-blue-400" />
@@ -199,8 +225,15 @@ export const Dashboard = () => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Completed</p>
-                    <p className="text-3xl font-bold" data-testid="stat-completed">{stats.byStatus.completed}</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Completed
+                    </p>
+                    <p
+                      className="text-3xl font-bold"
+                      data-testid="stat-completed"
+                    >
+                      {stats.byStatus.completed}
+                    </p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
                     <CheckCircle2 className="w-6 h-6 text-green-400" />
@@ -213,8 +246,15 @@ export const Dashboard = () => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">In Progress</p>
-                    <p className="text-3xl font-bold" data-testid="stat-in-progress">{stats.byStatus.inProgress}</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      In Progress
+                    </p>
+                    <p
+                      className="text-3xl font-bold"
+                      data-testid="stat-in-progress"
+                    >
+                      {stats.byStatus.inProgress}
+                    </p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
                     <Clock className="w-6 h-6 text-yellow-400" />
@@ -227,8 +267,15 @@ export const Dashboard = () => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Overdue</p>
-                    <p className="text-3xl font-bold" data-testid="stat-overdue">{stats.overdue}</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Overdue
+                    </p>
+                    <p
+                      className="text-3xl font-bold"
+                      data-testid="stat-overdue"
+                    >
+                      {stats.overdue}
+                    </p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
                     <AlertCircle className="w-6 h-6 text-red-400" />
@@ -257,7 +304,10 @@ export const Dashboard = () => {
               </div>
               <div className="flex flex-wrap gap-2">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-[150px]" data-testid="status-filter">
+                  <SelectTrigger
+                    className="w-[150px]"
+                    data-testid="status-filter"
+                  >
                     <Filter className="w-4 h-4 mr-2" />
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
@@ -269,8 +319,14 @@ export const Dashboard = () => {
                   </SelectContent>
                 </Select>
 
-                <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                  <SelectTrigger className="w-[150px]" data-testid="priority-filter">
+                <Select
+                  value={priorityFilter}
+                  onValueChange={setPriorityFilter}
+                >
+                  <SelectTrigger
+                    className="w-[150px]"
+                    data-testid="priority-filter"
+                  >
                     <BarChart3 className="w-4 h-4 mr-2" />
                     <SelectValue placeholder="Priority" />
                   </SelectTrigger>
@@ -283,7 +339,10 @@ export const Dashboard = () => {
                 </Select>
 
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-[150px]" data-testid="sort-by-filter">
+                  <SelectTrigger
+                    className="w-[150px]"
+                    data-testid="sort-by-filter"
+                  >
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
@@ -295,15 +354,20 @@ export const Dashboard = () => {
                 </Select>
 
                 <Button
-                  variant={sortOrder === 'asc' ? 'default' : 'outline'}
+                  variant={sortOrder === "asc" ? "default" : "outline"}
                   size="icon"
-                  onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                  onClick={() =>
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                  }
                   data-testid="sort-order-button"
                 >
-                  {sortOrder === 'asc' ? '↑' : '↓'}
+                  {sortOrder === "asc" ? "↑" : "↓"}
                 </Button>
 
-                <Button onClick={handleCreateTask} data-testid="create-task-button">
+                <Button
+                  onClick={handleCreateTask}
+                  data-testid="create-task-button"
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   New Task
                 </Button>
@@ -323,18 +387,26 @@ export const Dashboard = () => {
               <ListTodo className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
               <h3 className="text-xl font-semibold mb-2">No tasks found</h3>
               <p className="text-muted-foreground mb-4">
-                {searchTerm || statusFilter !== 'all' || priorityFilter !== 'all'
-                  ? 'Try adjusting your filters'
-                  : 'Create your first task to get started'}
+                {searchTerm ||
+                statusFilter !== "all" ||
+                priorityFilter !== "all"
+                  ? "Try adjusting your filters"
+                  : "Create your first task to get started"}
               </p>
-              <Button onClick={handleCreateTask} data-testid="empty-state-create-button">
+              <Button
+                onClick={handleCreateTask}
+                data-testid="empty-state-create-button"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Task
               </Button>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4" data-testid="tasks-grid">
+          <div
+            className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4"
+            data-testid="tasks-grid"
+          >
             {tasks.map((task) => (
               <Card
                 key={task._id}
@@ -344,7 +416,12 @@ export const Dashboard = () => {
               >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-lg line-clamp-2" data-testid="task-title">{task.title}</CardTitle>
+                    <CardTitle
+                      className="text-lg line-clamp-2"
+                      data-testid="task-title"
+                    >
+                      {task.title}
+                    </CardTitle>
                     <div className="flex gap-1">
                       <Badge
                         variant="outline"
@@ -357,7 +434,10 @@ export const Dashboard = () => {
                     </div>
                   </div>
                   {task.description && (
-                    <CardDescription className="line-clamp-2" data-testid="task-description">
+                    <CardDescription
+                      className="line-clamp-2"
+                      data-testid="task-description"
+                    >
                       {task.description}
                     </CardDescription>
                   )}
@@ -372,7 +452,9 @@ export const Dashboard = () => {
                       >
                         {getStatusIcon(task.status)}
                         <span className="ml-1 capitalize">
-                          {task.status === 'in-progress' ? 'In Progress' : task.status}
+                          {task.status === "in-progress"
+                            ? "In Progress"
+                            : task.status}
                         </span>
                       </Badge>
                     </div>
@@ -380,7 +462,10 @@ export const Dashboard = () => {
                     {task.dueDate && (
                       <div className="flex items-center gap-2 text-sm">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
-                        <span className={getDueDateColor(task.dueDate, task.status)} data-testid="task-due-date">
+                        <span
+                          className={getDueDateColor(task.dueDate, task.status)}
+                          data-testid="task-due-date"
+                        >
                           {getDueDateLabel(task.dueDate)}
                         </span>
                       </div>
@@ -388,7 +473,7 @@ export const Dashboard = () => {
 
                     <div className="flex items-center justify-between pt-2 border-t border-border/50">
                       <span className="text-xs text-muted-foreground">
-                        {format(new Date(task.createdAt), 'MMM dd, yyyy')}
+                        {format(new Date(task.createdAt), "MMM dd, yyyy")}
                       </span>
                       <Button
                         variant="ghost"
