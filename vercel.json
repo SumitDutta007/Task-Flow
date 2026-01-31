@@ -12,11 +12,29 @@
   "routes": [
     {
       "src": "/static/(.*)",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      },
       "dest": "frontend/build/static/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "frontend/build/favicon.ico"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "frontend/build/manifest.json"
+    },
+    {
+      "src": "/logo(.*)",
+      "dest": "frontend/build/logo$1"
     },
     {
       "src": "/(.*)",
       "dest": "frontend/build/index.html"
     }
-  ]
+  ],
+  "env": {
+    "REACT_APP_BACKEND_URL": "@backend_url"
+  }
 }
